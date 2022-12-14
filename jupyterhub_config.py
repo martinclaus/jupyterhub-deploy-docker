@@ -54,11 +54,27 @@ c.JupyterHub.hub_port = 8080
 c.JupyterHub.cookie_secret_file = "/data/jupyterhub_cookie_secret"
 c.JupyterHub.db_url = "sqlite:////data/jupyterhub.sqlite"
 
-# Authenticate users with Native Authenticator
-c.JupyterHub.authenticator_class = "nativeauthenticator.NativeAuthenticator"
+# Authenticate users via LTI 1.3
+c.JupyterHub.authenticator_class = "ltiauthenticator.lti13.auth.LTI13Authenticator"
 
 # Allow anyone to sign-up without approval
-c.NativeAuthenticator.open_signup = True
+c.LTI13Authenticator.username_key = "given_name"
+
+# The LTI 1.3 authorization url
+c.LTI13Authenticator.authorize_url = (
+    "https://canvas.instructure.com/api/lti/authorize_redirect"
+)
+
+# The external tool's client id as represented within the platform (LMS)
+# Note: the client id is not required by some LMS's for authentication.
+# Only required, if the JupyterHub is suppose to send back information to the LMS
+# c.LTI13Authenticator.client_id = "125900000000000329"
+
+# The LTI 1.3 endpoint url, also known as the OAuth2 callback url
+c.LTI13Authenticator.endpoint = "http://localhost:8000/hub/oauth_callback"
+
+# The LTI 1.3 token url used to validate JWT signatures
+c.LTI13Authenticator.token_url = "https://canvas.instructure.com/login/oauth2/token"
 
 # Allowed admins
 admin = os.environ.get("JUPYTERHUB_ADMIN")
