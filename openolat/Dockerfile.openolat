@@ -1,0 +1,76 @@
+# This docker file follows installation instructions from https://docs.openolat.org/manual_admin/installation/installGuide/
+
+FROM ubuntu:22.04
+
+# install system dependencies / requirements
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt update && apt install -y \
+    wget \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# create service account
+RUN useradd -m -s /bin/bash openolat && mkdir -p /home/openolat/downloads
+
+USER openolat
+ENV HOME=/home/openolat
+WORKDIR ${HOME}
+
+# Set up JDK
+ARG JDK_URL=https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.17%2B8/OpenJDK11U-jdk_x64_linux_hotspot_11.0.17_8.tar.gz
+RUN wget ${JDK_URL} \
+    && tar xvf OpenJDK11U-jdk_x64_linux_hotspot_11.0.17_8.tar.gz \
+    && rm -rf OpenJDK11U-jdk_x64_linux_hotspot_11.0.17_8.tar.gz\
+    && ln -s jdk-11.0.17+8 jre
+
+# Set up Tomcat
+ARG TOMCAT_URL=https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.70/bin/apache-tomcat-9.0.70.tar.gz
+RUN wget ${TOMCAT_URL} \
+    && tar xvf apache-tomcat-9.0.70.tar.gz \
+    && rm -rf apache-tomcat-9.0.70.tar.gz\
+    && ln -s apache-tomcat-9.0.70 tomcat \
+    # Set up tomcat in home
+    && mkdir bin conf lib run logs /tmp/openolat \
+    && cd ~/conf && ln -s ../tomcat/conf/web.xml web.xml && cd ~ \
+    && cd ~/bin && ln -s ../tomcat/bin/catalina.sh catalina.sh && cd ~ \
+    && cd ~ && ln -s tomcat/bin/startup.sh start && ln -s tomcat/bin/shutdown.sh stop \
+    && mkdir -p ${HOME}/conf/Catalina/localhost/
+
+# Set up OpenOlat
+ARG OPENOLAT_URL=https://www.openolat.com/releases/openolat_1714.war
+RUN wget ${OPENOLAT_URL} \
+    && unzip -d openolat-17.1.4 openolat_1714.war \
+    && rm -rf openolat_1714.war \
+    && ln -s openolat-17.1.4 webapp
+
+# set up postgresql database
+# USER postgres
+# RUN psql -c "create user oodbu with password 'oodbpasswd';" \
+#     && psql -c "create database oodb with owner oodbu;"
+# USER openolat
+# RUN "localhost:5432:oodb:oodbu:oodbpasswd" > ${HOME}/.pgpass \
+#     && psql -h localhost -U oodbu -d oodb -f ${HOME}/webapp/WEB-INF/classes/database/postgresql/setupDatabase.sql
+
+ENV CATALINA_HOME=${HOME}/tomcat
+ENV CATALINA_BASE=${HOME}
+ENV JRE_HOME=${HOME}/jre
+ENV CATALINA_PID=${HOME}/run/openolat.pid
+ENV CATALINA_TMPDIR=/tmp/openolat
+ENV CATALINA_OPTS=" \
+    -Xmx1024m -Xms512m -XX:MaxMetaspaceSize=512m \
+    -Duser.name=openolat \
+    -Duser.timezone=Europe/Zurich \
+    -Dspring.profiles.active=myprofile \
+    -Djava.awt.headless=true \
+    -Djava.net.preferIPv4Stack=true \
+    -XX:+HeapDumpOnOutOfMemoryError \
+    -XX:HeapDumpPath=. \
+    "
+
+# copy configuration files
+COPY server.xml ${HOME}/conf/server.xml
+COPY olat.local.properties ${HOME}/lib/olat.local.properties
+COPY ROOT.xml ${HOME}/conf/Catalina/localhost/ROOT.xml
+COPY log4j2.xml ${HOME}/lib/log4j2.xml
+
+ENTRYPOINT [ "/home/openolat/bin/catalina.sh", "run" ]
