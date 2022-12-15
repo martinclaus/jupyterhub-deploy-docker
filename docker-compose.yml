@@ -38,79 +38,10 @@ services:
       # Using this run command
       DOCKER_SPAWN_CMD: start-singleuser.sh
     command: >
-      jupyterhub -f /srv/jupyterhub/jupyterhub_config.py
-
-  web:
-    image: nginx:latest
-    volumes:
-      - ./moodle-code:/usr/share/nginx/html
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - ./moodle-data:/var/www/moodledata:ro
-      - phpsocket:/sock
-    ports:
-      - 80:80
-    networks:
-      - jupyterhub-network
-
-  db:
-    hostname: db
-    container_name: db
-    image: mysql:5.7
-    environment:
-      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-      MYSQL_DATABASE: "${MOODLE_DB_NAME}"
-      MYSQL_USER: "${MOODLE_MYSQL_USER}"
-      MYSQL_PASSWORD: "${MOODLE_MYSQL_PASSWORD}"
-    networks:
-      - jupyterhub-network
-    volumes:
-      - ./bbdd:/var/lib/mysql
-      - ./dump:/docker-entrypoint-initdb.d
-
-  moodle:
-    hostname: moodle
-    container_name: moodle
-    image: cateduac/moodle:3.7.6-nginx-fpm
-    environment:
-      MOODLE_DB_HOST: "${MOODLE_DB_HOST}"
-      MOODLE_DB_NAME: "${MOODLE_DB_NAME}"
-      MOODLE_DB_USER: "${MOODLE_MYSQL_USER}"
-      MOODLE_DB_PASSWORD: "${MOODLE_MYSQL_PASSWORD}"
-      MOODLE_URL: "${MOODLE_URL}"
-      MOODLE_ADMIN_USER: "${MOODLE_ADMIN_USER}"
-      MOODLE_ADMIN_PASSWORD: "${MOODLE_ADMIN_PASSWORD}"
-      MOODLE_ADMIN_EMAIL: "${MOODLE_ADMIN_EMAIL}"
-      MOODLE_LANG: "${MOODLE_LANG}"
-      MOODLE_SITE_NAME: "${MOODLE_SITE_NAME}"
-      MOODLE_SITE_FULLNAME: "${MOODLE_SITE_FULLNAME}"
-      SSL_PROXY: "${SSL_PROXY}"
-      SMTP_HOSTS: "${SMTP_HOSTS}"
-      SMTP_USER: "${SMTP_USER}"
-      SMTP_PASSWORD: "${SMTP_PASSWORD}"
-      SMTP_MAXBULK: "${SMTP_MAXBULK}"
-      NO_REPLY_ADDRESS: "${NO_REPLY_ADDRESS}"
-      CRON_BROWSER_PASS: "${CRON_BROWSER_PASS}"
-      MOODLE_MANAGER: "${MOODLE_MANAGER}"
-      MANAGER_PASSWORD: "${MANAGER_PASSWORD}"
-      INSTALL_TYPE: "${INSTALL_TYPE}"
-      SCHOOL_TYPE: "${SCHOOL_TYPE}"
-      ASESORIA_PASSWORD: "${ASESORIA_PASSWORD}"
-      ASESORIA_EMAIL: "${ASESORIA_EMAIL}"
-    networks:
-      - jupyterhub-network
-    volumes:
-      - ./moodle-entrypoint.sh:/usr/bin/docker-entrypoint.sh
-      - ./moodle-data:/var/www/moodledata
-      - ./moodle-code:/var/www/html
-      - ./fpm-conf:/usr/local/etc/php-fpm.d
-      - ./php-conf/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini
-      - ./php-conf/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
-      - ./init-scripts:/init-scripts
-      - phpsocket:/sock
+      jupyterhub -f /srv/jupyterhub/jupyterhub_config.py --debug
 
 volumes:
   jupyterhub-data:
-  phpsocket:
 
 
 networks:
