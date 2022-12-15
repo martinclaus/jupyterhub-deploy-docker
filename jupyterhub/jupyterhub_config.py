@@ -66,10 +66,10 @@ c.LTI13Authenticator.authorize_url = "http://localhost/mod/lti/auth.php"
 # The external tool's client id as represented within the platform (LMS)
 # Note: the client id is not required by some LMS's for authentication.
 # Only required, if the JupyterHub is suppose to send back information to the LMS
-c.LTI13Authenticator.client_id = "2t1ZSR8uvaoVH8T"
+# c.LTI13Authenticator.client_id = "2t1ZSR8uvaoVH8T"
 
 # The LTI 1.3 endpoint url, also known as the OAuth2 callback url
-c.LTI13Authenticator.endpoint = "http://localhost:8000/hub/oauth_callback"
+c.LTI13Authenticator.endpoint = "http://localhost/mod/lti/certs.php"
 
 # The LTI 1.3 token url used to validate JWT signatures
 c.LTI13Authenticator.token_url = "http://localhost/mod/lti/token.php"
