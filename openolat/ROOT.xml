@@ -8,5 +8,5 @@
          validationQueryTimeout="-1" 
          testOnBorrow="true" 
          testOnReturn="false"
-         url="jdbc:postgresql://localhost:5432/oodb"/>
+         url="jdbc:postgresql://olatdb:5432/oodb"/>
 </Context>

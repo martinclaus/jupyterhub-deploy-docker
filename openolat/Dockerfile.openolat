@@ -2,6 +2,8 @@
 
 FROM ubuntu:22.04
 
+ENV LANG C.UTF-8
+
 # install system dependencies / requirements
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt update && apt install -y \
@@ -55,22 +57,23 @@ ENV CATALINA_HOME=${HOME}/tomcat
 ENV CATALINA_BASE=${HOME}
 ENV JRE_HOME=${HOME}/jre
 ENV CATALINA_PID=${HOME}/run/openolat.pid
-ENV CATALINA_TMPDIR=/tmp/openolat
-ENV CATALINA_OPTS=" \
-    -Xmx1024m -Xms512m -XX:MaxMetaspaceSize=512m \
-    -Duser.name=openolat \
-    -Duser.timezone=Europe/Zurich \
-    -Dspring.profiles.active=myprofile \
-    -Djava.awt.headless=true \
-    -Djava.net.preferIPv4Stack=true \
-    -XX:+HeapDumpOnOutOfMemoryError \
-    -XX:HeapDumpPath=. \
-    "
+# ENV CATALINA_TMPDIR=/tmp/openolat
+# ENV CATALINA_OPTS=" \
+#     -Xmx1024m -Xms512m -XX:MaxMetaspaceSize=512m \
+#     -Duser.name=openolat \
+#     -Duser.timezone=Europe/Zurich \
+#     -Dspring.profiles.active=myprofile \
+#     -Djava.awt.headless=true \
+#     -Djava.net.preferIPv4Stack=true \
+#     -XX:+HeapDumpOnOutOfMemoryError \
+#     -XX:HeapDumpPath=. \
+#     "
 
 # copy configuration files
-COPY server.xml ${HOME}/conf/server.xml
-COPY olat.local.properties ${HOME}/lib/olat.local.properties
-COPY ROOT.xml ${HOME}/conf/Catalina/localhost/ROOT.xml
-COPY log4j2.xml ${HOME}/lib/log4j2.xml
+# COPY server.xml ${HOME}/conf/server.xml
+# COPY olat.local.properties ${HOME}/lib/olat.local.properties
+# COPY ROOT.xml ${HOME}/conf/Catalina/localhost/ROOT.xml
+# COPY log4j2.xml ${HOME}/lib/log4j2.xml
 
-ENTRYPOINT [ "/home/openolat/bin/catalina.sh", "run" ]
+ENTRYPOINT [ "/home/openolat/bin/catalina.sh" ]
+CMD [ "run" ]

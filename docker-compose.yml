@@ -12,7 +12,6 @@ services:
       args:
         JUPYTERHUB_VERSION: 3.1.0
     restart: always
-    image: jupyterhub
     container_name: jupyterhub
     networks:
       - jupyterhub-network
@@ -40,8 +39,53 @@ services:
     command: >
       jupyterhub -f /srv/jupyterhub/jupyterhub_config.py --debug
 
+  olat:
+    build:
+      context: ./openolat/
+      dockerfile: Dockerfile.openolat
+    restart: always
+    container_name: openolat
+    networks:
+      - jupyterhub-network
+    ports:
+      - 8088:8088
+    volumes:
+      - "./openolat/ROOT.xml:/home/openolat/conf/Catalina/localhost/ROOT.xml:ro"
+      - "./openolat/server.xml:/home/openolat/conf/server.xml:ro"
+      - "./openolat/olat.local.properties:/home/openolat/lib/olat.local.properties:ro"
+      - "openolat-data:/olatdata:rw"
+    environment:
+      CATALINA_TMPDIR: /tmp/openolat
+      CATALINA_OPTS: >
+        -Xmx1024m -Xms512m -XX:MaxMetaspaceSize=512m -Duser.name=openolat -Duser.timezone=Europe/Zurich -Dspring.profiles.active=myprofile -Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=.
+    depends_on:
+      - olatdb
+
+  olatdb:
+    image: postgres:15
+    restart: always
+    container_name: olatdb
+    networks:
+      - jupyterhub-network
+    volumes:
+      - "openolat-db:/var/lib/postgresql/data:rw"
+      - "./openolat/setupDatabase.sql:/docker-entrypoint-initdb.d/setupDatabase.sql:ro"
+    environment:
+      POSTGRES_USER: oodbu
+      POSTGRES_PASSWORD: oodbpasswd
+      POSTGRES_DB: oodb
+  # adminer:
+  #   image: adminer
+  #   restart: always
+  #   ports:
+  #     - 8080:8080
+  #   networks:
+  #     - jupyterhub-network
+
 volumes:
   jupyterhub-data:
+  openolat-data:
+  openolat-db:
 
 
 networks:
