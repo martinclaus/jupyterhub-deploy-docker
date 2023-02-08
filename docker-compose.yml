@@ -27,6 +27,22 @@ services:
     ports:
       - "8000:8000"
     environment:
+      # User name claim containing a string which will be used by Jupyterhub as user name.
+      # Must be a unique identifyer of the user on the LTI Platform (LMS).
+      LTI13_USERNAME_KEY: sub
+      # The LTI 1.3 authorization url. The url of the platforms (LMS) endpoint for OAuth2
+      # authentication
+      LTI13_AUTHORIZE_URL: https://my-lms.com/lti/auth
+      # The external tool's client id as represented within the platform (LMS)
+      # Note: the client id is not required by some LMS's for authentication.
+      # Only required, if the JupyterHub is suppose to send back information to the LMS
+      LTI13_CLIENT_ID: 2t1ZSR8uvaoVH8T
+      # The JWKS endpoint of the platform (LMS).
+      # Currently not used since JWK verification is off (hard coded).
+      LTI13_ENDPOINT: https://my-lms.com/lti/keys
+      # The LTI 1.3 token url used to validate JWT signatures
+      LTI13_TOKEN_URL: https://my-lms.com/lti/token
+
       # This username will be a JupyterHub admin
       JUPYTERHUB_ADMIN: admin
       # All containers will join this network

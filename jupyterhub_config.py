@@ -10,6 +10,34 @@ c = get_config()
 # avoid having to rebuild the JupyterHub container every time we change a
 # configuration parameter.
 
+##############################################################################
+# LTI 1.3 Authenticator configuration
+##############################################################################
+# Authenticate users via LTI 1.3
+c.JupyterHub.authenticator_class = "ltiauthenticator.lti13.auth.LTI13Authenticator"
+
+# User name claim containing a string which will be used by Jupyterhub as user name.
+# Must be a unique identifyer of the user on the LTI Platform (LMS).
+c.LTI13Authenticator.username_key = os.environ["LTI13_USERNAME_KEY"]
+
+# The LTI 1.3 authorization url. The url of the platforms (LMS) endpoint for OAuth2
+# authentication
+c.LTI13Authenticator.authorize_url = os.environ["LTI13_AUTHORIZE_URL"]
+
+# The external tool's client id as represented within the platform (LMS)
+# Note: the client id is not required by some LMS's for authentication.
+# Only required, if the JupyterHub is suppose to send back information to the LMS
+c.LTI13Authenticator.client_id = os.environ.get("LTI13_CLIENT_ID", "")
+
+# The JWKS endpoint of the platform (LMS).
+# Currently not used since JWK verification is off (hard coded).
+c.LTI13Authenticator.endpoint = os.environ["LTI13_ENDPOINT"]
+
+# The LTI 1.3 token url used to validate JWT signatures
+c.LTI13Authenticator.token_url = os.environ["LTI13_TOKEN_URL"]
+##############################################################################
+
+
 # Spawn single-user servers as Docker containers
 c.JupyterHub.spawner_class = "dockerspawner.DockerSpawner"
 
@@ -53,26 +81,6 @@ c.JupyterHub.hub_port = 8080
 # Persist hub data on volume mounted inside container
 c.JupyterHub.cookie_secret_file = "/data/jupyterhub_cookie_secret"
 c.JupyterHub.db_url = "sqlite:////data/jupyterhub.sqlite"
-
-# Authenticate users via LTI 1.3
-c.JupyterHub.authenticator_class = "ltiauthenticator.lti13.auth.LTI13Authenticator"
-
-# Allow anyone to sign-up without approval
-c.LTI13Authenticator.username_key = "given_name"
-
-# The LTI 1.3 authorization url
-c.LTI13Authenticator.authorize_url = "http://localhost/mod/lti/auth.php"
-
-# The external tool's client id as represented within the platform (LMS)
-# Note: the client id is not required by some LMS's for authentication.
-# Only required, if the JupyterHub is suppose to send back information to the LMS
-c.LTI13Authenticator.client_id = "2t1ZSR8uvaoVH8T"
-
-# The LTI 1.3 endpoint url, also known as the OAuth2 callback url
-c.LTI13Authenticator.endpoint = "http://localhost:8000/hub/oauth_callback"
-
-# The LTI 1.3 token url used to validate JWT signatures
-c.LTI13Authenticator.token_url = "http://localhost/mod/lti/token.php"
 
 # Allowed admins
 admin = os.environ.get("JUPYTERHUB_ADMIN")
