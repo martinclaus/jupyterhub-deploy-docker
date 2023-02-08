@@ -3,9 +3,14 @@
 ARG JUPYTERHUB_VERSION
 FROM jupyterhub/jupyterhub:$JUPYTERHUB_VERSION
 
+# Add git to enable pip to install from github
+RUN apt-get update && apt-get install -y \
+        git  \
+        && rm -rf /var/lib/apt/lists/*
+
 # Install dockerspawner, nativeauthenticator
 RUN python3 -m pip install --no-cache-dir \
         dockerspawner==12.* \
-        jupyterhub-ltiauthenticator==1.3
+        'jupyterhub-ltiauthenticator @ git+https://github.com/martinclaus/ltiauthenticator@1.3.0-patch-1'
 
 CMD ["jupyterhub", "-f", "/srv/jupyterhub/jupyterhub_config.py"]
