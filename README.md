@@ -7,21 +7,24 @@ In this context is the Jupyterhub a *tool* and the learning management system (L
 ### Jupyterhub configuration
 The hub is configured via environment variables set in the [docker-compose.yml](./docker-compose.yml).
 
--  LTI13_USERNAME_KEY: User name claim containing a string which will be used by Jupyterhub as user name. Must be a unique identifyer of the user on the LTI Platform (LMS).
--  LTI13_AUTHORIZE_URL: The LTI 1.3 authorization url. The url of the platforms (LMS) endpoint for OAuth2 authentication.
--  LTI13_CLIENT_ID: The external tool's client id as represented within the platform (LMS) Note: the client id is not required by some LMS's for authentication. Only required, if the JupyterHub is supposed to send back information to the LMS.
--  LTI13_ENDPOINT: The JWKS endpoint of the platform (LMS). Currently not used since JWK verification is off (hard coded).
--  LTI13_TOKEN_URL: The LTI 1.3 token url used to validate JWT signatures
+-  `LTI13_USERNAME_KEY`: User name claim containing a string which will be used by Jupyterhub as user name. Must be a unique identifyer of the user on the LTI Platform (LMS).
+-  `LTI13_AUTHORIZE_URL`: The LTI 1.3 authorization url. The url of the platforms (LMS) endpoint for OAuth2 authentication.
+-  `LTI13_CLIENT_ID`: The external tool's client id as represented within the platform (LMS) Note: the client id is not required by some LMS's for authentication. Only required, if the JupyterHub is supposed to send back information to the LMS.
+-  `LTI13_ENDPOINT`: The JWKS endpoint of the platform (LMS). Currently not used since JWK verification is off (hard coded).
+-  `LTI13_TOKEN_URL`: The LTI 1.3 token url used to validate JWT signatures
 
-### Platform configurration
+### Platform configuration
 On the platform (LMS), the following endpoints provided by the Jupyterhub authenticator typically needs to be configured:
 -  Tool URI: Base url of the jupyterhub (http://localhost:8000)
 -  Authentication initiation URI: URI of the LTI 1.3 login handler of the Jupyterhub. Ends with `/hub/oauth_login` (http://localhost:8000/hub/oauth_login)
--  Redirect URIs: URI of OAuth Callback handler. Ends with `/hub/oauth_callback` (http://localhost:8000/hub/oauth_login)
+-  Redirect URIs: URI of OAuth Callback handler. Ends with `/hub/oauth_callback` (http://localhost:8000/hub/oauth_callback)
 
 Encryption related settings take no effect since JWK verification is curently not supported by `ltiauthenticator`.
 
-** From here on follows the upstream README content which may be outdated or unrelated. **
+The `ltiauthenticator` also provides a configuration endpoint (http://localhost:8000/hub/lti13/config) which returns a JSON that may be used by a platform to autoconfigure the tool connection.
+
+---
+**From here on follows the upstream README content which may be outdated or unrelated.**
 
 **jupyterhub-deploy-docker** provides a reference
 deployment of [JupyterHub](https://github.com/jupyter/jupyterhub), a
